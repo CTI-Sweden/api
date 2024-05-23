@@ -1,7 +1,10 @@
+import os
 from elasticsearch import Elasticsearch
 from pydantic import BaseModel
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+DEFAULT_ELASTIC_HOST = "http://localhost:9200"
 
 class SearchQuery(BaseModel):
     text: str
@@ -30,7 +33,7 @@ def health():
 # endpoint that allows users to search on the frontend :)
 @app.post("/search")
 def search(search_query: SearchQuery):
-    es = Elasticsearch("http://localhost:9200")
+    es = Elasticsearch(os.environ.get("CTI_ELASTIC_HOST", DEFAULT_ELASTIC_HOST))
     query = {
         "query_string": {
             "query": search_query.text,
